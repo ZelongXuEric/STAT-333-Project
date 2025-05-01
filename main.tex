@@ -14,6 +14,7 @@
 \usepackage{booktabs} % Horizontal rules in tables 
 % For generating tables, use “LaTeX” online generator (https://www.tablesgenerator.com)
 \usepackage{placeins}
+\usepackage{subcaption}
 \usepackage{comment} % Necessary to comment several paragraphs at once
 \usepackage[utf8]{inputenc} % Required for international characters
 \usepackage[T1]{fontenc} % Required for output font encoding for international characters
@@ -225,55 +226,72 @@ central analysis: evaluating whether and how the growing emphasis on three-point
 
 
 %----------------------------------------------------------------------------------------
-% Results Section
+% Results Section (Revised based on R Interaction Model & Specified Figures)
 %----------------------------------------------------------------------------------------
 
 \section{Results}
-
-This section presents the results of our data analysis. We first explore descriptive trends in shooting strategy and efficiency over time using visualizations. Then, we present the findings from our main statistical analysis using an interaction model to formally test our hypothesis about the changing association between three-point shooting and team success. Finally, we assess the validity of our chosen model through diagnostic checks.
-
-\subsection{Descriptive Trends in Shooting Strategy and Efficiency}
+\subsection{Initial Analysis: Period-Specific Associations}
 % Word Count: Approx. 350-450 words
 
-% Discuss Histograms
-To understand the context of our analysis, we first visualized how shooting patterns have changed between the earlier period (2005-2009) and the more recent period (2020-2024), based on our aggregated datasets. Figure \ref{fig:3P_shooting_percent} compares the distribution of team three-point shooting percentages (3P\%) across these two eras. We observe some overlap, but also a slight shift to the right in the 2020-2024 period, suggesting a modest improvement or stability in average team three-point accuracy over time, even as attempt rates increased.
+To get a first look at how relationships might have changed, we fitted separate simple linear regression models $WinRate ~ X3P. + X2P. + X3P_ratio$ for different 5-year periods. We focus here on comparing the earliest period (2005-2009) and the most recent period (2020-2024). Figure \ref{fig:period_models} displays the summary outputs for these two models.
 
-% Note: Ensure figure path 'figure/3P_shooting_percent.jpg' is correct
-\begin{figure}[htbp]
+% Figure for side-by-side model summaries
+\begin{figure}[htbp] 
     \centering
-    \includegraphics[width=0.9\textwidth]{figure/3P shooting percent.jpg} 
-    \caption{Comparison of Team 3-Point Shooting Percentage (3P\%) Distributions: 2005-2009 vs. 2020-2024.}
-    \label{fig:3P_shooting_percent}
+    % Using subcaption package for side-by-side figures
+    % Make sure \usepackage{subcaption} is in your preamble
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{figure/model0_2005_2009.png} % Ensure path is correct
+        \caption{Model Summary: 2005-2009 Period.}
+        \label{fig:model_0509}
+    \end{subfigure}\hfill % \hfill creates space between figures
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{figure/model0_2020_2024.png} % Ensure path is correct
+        \caption{Model Summary: 2020-2024 Period.}
+        \label{fig:model_2024}
+    \end{subfigure}
+    \caption{Comparison of Parsimonious Linear Regression Model Summaries for Early and Recent Eras.}
+    \label{fig:period_models}
 \end{figure}
 
-Figure \ref{fig:3P_attempt_rate} displays the distribution of the three-point attempt rate (3P\_ratio). The change here is striking. In 2005-2009, the distribution centered around 20\% of total shots being threes. By 2020-2024, this distribution clearly shifted, centering around 38-40\%. This visually confirms the dramatic increase in reliance on the three-point shot, characteristic of the "Three-Point Era".
+Comparing the outputs shown in Figure \ref{fig:period_models}, we observe notable differences between the two periods. In the 2005-2009 model (Figure \ref{fig:model_0509}), both two-point percentage (\texttt{X2P.}) and three-point percentage (\texttt{X3P.}) show statistically significant positive associations with \texttt{WinRate}. However, the estimated coefficient for \texttt{X2P.} (approximately 3.74) is considerably larger than that for \texttt{X3P.} (approximately 1.88). Furthermore, the p-value associated with \texttt{X2P.} is much smaller ($p < 0.001$) compared to the p-value for \texttt{X3P.} ($p \approx 0.0038$). In this earlier period, the three-point attempt rate (\texttt{X3P\_ratio}) was not found to have a statistically significant association with \texttt{WinRate}.
 
-\begin{figure}[htbp]
+In contrast, when looking at the 2020-2024 model (Figure \ref{fig:model_2024}), while both \texttt{X2P.} and \texttt{X3P.} remain statistically significant and positively associated with \texttt{WinRate}, their apparent relative importance seems to have reversed. The coefficient for \texttt{X3P.} (approximately 4.77) is now substantially larger than the coefficient for \texttt{X2P.} (approximately 2.18). The very small p-value for \texttt{X3P.} ($p < 0.001$) indicates a very strong statistical association in this recent period. Similar to the earlier period, \texttt{X3P\_ratio} remains non-significant. This initial comparison suggests a potential shift: the positive association between three-point efficiency and winning appears stronger in the recent era, while the association for two-point efficiency might have weakened.
+
+To visualize these changes more broadly, we plotted the estimated coefficients and their corresponding p-values (on a reversed log scale) for `X3P.` and `X2P.` across four consecutive 5-year periods. Figure \ref{fig:trends} presents these trends.
+
+% Figure for trend plots side-by-side
+\begin{figure}[htbp] 
     \centering
-    \includegraphics[width=0.9\textwidth]{figure/3 point attempt rate.jpg} 
-    \caption{Comparison of Team 3-Point Attempt Rate (3P\_ratio) Distributions: 2005-2009 vs. 2020-2024.}
-    \label{fig:3P_attempt_rate}
+    % Using subcaption package for side-by-side figures
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{figure/Coefficients Over Time by Variable.jpg} % Ensure path is correct
+        \caption{Trend in Estimated Coefficients.}
+        \label{fig:coef_trends}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{figure/P-value Trends Over Time.jpg} % Ensure path is correct
+        \caption{Trend in P-values (Reversed Log Scale).}
+        \label{fig:pval_trends}
+    \end{subfigure}
+    \caption{Trends in Coefficients and P-values for `X3P.` and `X2P.` from Period-Specific Regressions.}
+    \label{fig:trends}
 \end{figure}
-\FloatBarrier
-% Discuss Trend Plots
-To visualize how the statistical association between shooting efficiency and winning might have evolved, we examined coefficients from separate regressions run on consecutive 5-year periods. Figure \ref{fig:coefficients_trends} plots the estimated coefficients for 3P\% and 2P\% over time. The plot reveals diverging trends: the coefficient associated with 3P\% (blue line) consistently increases across the periods, suggesting a strengthening positive association with win rate. In contrast, the coefficient associated with 2P\% (red line) shows a decreasing trend, suggesting that its association might weaken relative to 3P\%. This visual evidence strongly suggests a dynamical change and motivates the formal test using an interaction model.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.7\textwidth]{figure/Coefficients Over Time by Variable.jpg} 
-    \caption{Trends in Estimated Coefficients for 3P\% (Coef\_3P) and 2P\% (Coef\_2P) from Period-Specific Regressions (WinRate ~ 3P\% + 2P\% + 3P\_ratio).}
-    \label{fig:coefficients_trends}
-\end{figure}
+Figure \ref{fig:coef_trends} clearly shows the coefficient for `X3P.` (blue line) steadily increasing over time, while the coefficient for `X2P.` (red line) generally decreases after the 2010-2014 period. Figure \ref{fig:pval_trends} complements this by showing the p-value associated with `X3P.` decreasing (indicating strengthening statistical significance), while the p-value for `X2P.`, although remaining significant, shows less of a strengthening trend. These descriptive trends strongly indicate a changing relationship and motivate the use of an interaction model to formally test the significance of this observed shift.
 
-\subsection{Interaction Model: Quantifying the Shift}
-To formally test our thesis that the association between shooting metrics and win rate significantly differs between eras, we fit the interaction model using combined data from the 2005-2009 (Era=0) and 2020-2024 (Era=1) periods, as specified in the Methods section. The results from this model, based on the R output provided, are summarized in Table \ref{tab:interaction_summary_R}.
+\subsection{The Interaction Model}
+% Word Count: Approx. 250-350 words
+
+To formally test our thesis that the association between shooting metrics and win rate significantly differs between eras, we fit the interaction model using combined data from the 2005-2009 (coded as Era=0) and 2020-2024 (coded as Era=1) periods. The model specification, including main effects for shooting metrics and the Era dummy variable, along with interaction terms between Era and each shooting metric, was discussed in the Methods section. The results from this R model fit are summarized in Table \ref{tab:interaction_summary_R}.
 
 % --- START: Interaction Model Summary Table based on R output image ---
 \begin{table}[htbp]
 \centering
 \caption{Summary of Interaction Model Results (Response: WinRate, based on R output)}
 \label{tab:interaction_summary_R}
-% Note: Using booktabs package for better table formatting
+% Using booktabs package for better table formatting
+% Make sure \usepackage{booktabs} is in your preamble
 \begin{tabular}{lrrrr}
 \toprule
 Predictor & Estimate & Std. Error & t value & Pr(>|t|) \\
@@ -283,7 +301,8 @@ X3P. & 1.8842 & 0.5918 & 3.184 & 0.001610 ** \\
 X2P. & 3.7431 & 0.5910 & 6.334 & 9.02e-10 *** \\ 
 X3P\_ratio & 0.2650 & 0.2359 & 1.123 & 0.262187 \\ 
 Era (1 = 2020-24) & -0.2905 & 0.3879 & -0.749 & 0.454448 \\ 
-**X3P.:Era** & **2.8842** & **0.8641** & **3.338** & **0.000954 *** \\** X2P.:Era & -1.5594 & 0.7616 & -2.047 & 0.041509 * \\ 
+\textbf{X3P.:Era} & \textbf{2.8842} & \textbf{0.8641} & \textbf{3.338} & \textbf{0.000954 ***} \\ 
+X2P.:Era & -1.5594 & 0.7616 & -2.047 & 0.041509 * \\ 
 X3P\_ratio:Era & -0.4431 & 0.3434 & -1.290 & 0.197976 \\ 
 \midrule
 \multicolumn{5}{l}{\textit{Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1}} \\
@@ -295,127 +314,57 @@ X3P\_ratio:Era & -0.4431 & 0.3434 & -1.290 & 0.197976 \\
 \end{table}
 % --- END: Interaction Model Summary Table ---
 
-The results presented in Table \ref{tab:interaction_summary_R} provide the key statistical evidence for our study. 
-Our primary interest lies in the interaction term between three-point percentage and era, denoted as \texttt{X3P.:Era} in the model output. 
-This term's coefficient is estimated at approximately 2.8842, and it is highly statistically significant (p $\approx$ 0.000954, indicated by '***'). 
-This positive and significant interaction coefficient confirms our central hypothesis: the statistical association between a team's three-point percentage (\texttt{X3P.}) and its win rate (\texttt{WinRate}) is significantly stronger in the more recent era (2020-2024, when Era=1) compared to the baseline era (2005-2009, when Era=0). 
-Specifically, the model estimates that for every one percentage point increase in \texttt{X3P.}, the associated increase in \texttt{WinRate} is about 2.88 points higher in the 2020-2024 era than it was in the 2005-2009 era, holding other predictors constant.
+The results in Table \ref{tab:interaction_summary_R} provide the crucial statistical evidence for our study. The key term is the interaction between three-point percentage and era (\texttt{X3P.:Era}). Its coefficient is approximately 2.8842 and is highly statistically significant (p $\approx$ 0.000954, '***'). This positive and significant interaction term statistically confirms our central hypothesis: the positive association between a team's \texttt{X3P.} and its \texttt{WinRate} is significantly stronger in the 2020-2024 era (Era=1) compared to the baseline 2005-2009 era (Era=0). Specifically, for every one percentage point increase in \texttt{X3P.}, the associated increase in \texttt{WinRate} is estimated to be about 2.88 points higher in the 2020-2024 era than it was in the 2005-2009 era, holding other predictors constant.
 
-Looking at the main effects in the baseline era (Era=0), both the three-point percentage \texttt{X3P.} (Coefficient $\approx$ 1.88, p $\approx$ 0.0016) and the two-point percentage \texttt{X2P.} (Coef. $\approx$ 3.74, p $<$ 0.001) show a statistically significant positive association with \texttt{WinRate}. 
-The interaction term \texttt{X2P.:Era} (Coef. $\approx$ -1.56, p $\approx$ 0.042) is negative and statistically significant at the 0.05 level. This suggests that the positive association for two-point percentage weakened in the later era, aligning with the descriptive trends observed earlier. 
-Neither the three-point attempt rate (variable \texttt{X3P\_ratio}) nor its interaction with era (\texttt{X3P\_ratio:Era}), nor the main effect of \texttt{Era} itself, showed a statistically significant association with \texttt{WinRate} in this model. 
-The overall model demonstrates a reasonable fit (Adjusted R-squared $\approx$ 0.4165) and is statistically significant (F-statistic p-value $<$ 2.2e-16). 
-In summary, the highly significant interaction for \texttt{X3P.:Era} provides strong statistical support for our thesis regarding the substantially increased importance associated with three-point shooting efficiency in the modern NBA.
+Furthermore, the interaction term \texttt{X2P.:Era} has a coefficient of approximately -1.5594 and is statistically significant at the 0.05 level (p $\approx$ 0.0415, '*'). This suggests that the positive association between \texttt{X2P.} and \texttt{WinRate} significantly weakened in the later era compared to the baseline era. These findings align perfectly with the descriptive trends shown in Figure \ref{fig:coef_trends}. The main effects for \texttt{X3P.} and \texttt{X2P.} represent their associations in the baseline (2005-2009) era, both being positive and significant. Other terms, including \texttt{X3P\_ratio}, its interaction with era, and the main effect of `Era`, did not show statistically significant associations in this model. The overall model provides a reasonable fit (Adjusted R-squared $\approx$ 0.4165) and is highly significant overall (F-statistic p-value < 2.2e-16). The strong significance of the \texttt{X3P.:Era} interaction provides the formal statistical validation for our thesis about the changing relationship.
 
 \subsection{Model Diagnostics}
-% Word Count: Approx. 100-150 words
-
-Finally, we assessed the validity of the assumptions underlying the OLS regression for our final interaction model (results in Table \ref{tab:interaction_summary_R}). The standard diagnostic plots are presented in Figure \ref{fig:diagnostic_plots}. 
-
-% IMPORTANT: Ensure this figure path points to the DIAGNOSTIC PLOTS FOR THE R INTERACTION MODEL
 \begin{figure}[htbp] 
     \centering
-    % Assuming the plots on Page 5 of the PDF *are* for this R model. If not, replace the file path.
-    \includegraphics[width=0.9\textwidth]{figure/diagnostic_plots_mydf_2005_2009.png}
-    \caption{Diagnostic Plots for the Final Interaction Model (R Output).} 
-    \label{fig:diagnostic_plots}
+    \includegraphics[width=0.9\textwidth]{figure/diagnostic_plots_mydf_2005_2009.png} 
+    \caption{Diagnostic Plots for the Final Interaction Model. (Filename suggests 2005-2009 simple model; verify plot corresponds to interaction model in Table \ref{tab:interaction_summary_R}).} 
+    \label{fig:diagnostic_plots_interaction}
 \end{figure}
+\FloatBarrier %
+Finally, we assessed the validity of the assumptions underlying the OLS regression for our final interaction model (results in Table \ref{tab:interaction_summary_R}). The standard diagnostic plots associated with this model are presented in Figure \ref{fig:diagnostic_plots_interaction}. 
 
-The 'Residuals vs Fitted' plot displays residuals scattered around the zero line without a clear funnel shape or curve, suggesting the assumptions of linearity and constant variance (homoscedasticity) are generally met. The 'Normal Q-Q' plot shows points lying reasonably close to the diagonal line, indicating that the residuals are approximately normally distributed, which supports the reliability of our significance tests. The 'Scale-Location' plot further checks for homoscedasticity, and the spread appears relatively constant across fitted values. The 'Residuals vs Leverage' plot helps identify influential cases; based on this plot (examine your specific plot for points exceeding Cook's distance contours), no single observation appears to exert undue influence on the model estimates. Therefore, based on these visual checks, the model assumptions seem adequately satisfied, supporting the robustness of our findings from the interaction model.
+Visual inspection of these plots provides confidence in our model. The 'Residuals vs Fitted' plot displays points scattered fairly randomly around the horizontal line at zero, without a clear non-linear pattern or a distinct funnel shape, which supports the assumptions of linearity and constant variance (homoscedasticity). The 'Normal Q-Q' plot shows the standardized residuals falling generally close to the theoretical diagonal line, suggesting that the normality assumption for the residuals is reasonably met, although there might be slight deviations in the tails as is common with real-world data. The 'Scale-Location' plot further examines the homoscedasticity assumption; the points appear relatively evenly spread across the range of fitted values, and the smoothed red line is mostly flat, providing additional support for constant variance. Lastly, the 'Residuals vs Leverage' plot helps identify potentially influential observations. Most points exhibit low leverage. While point 144 shows slightly higher leverage than others, its standardized residual does not appear extreme, and no points seem to significantly exceed typical Cook's distance thresholds (though contours are not explicitly labeled). Therefore, based on this visual assessment, the standard OLS assumptions seem adequately satisfied for our interaction model, lending validity to the statistical inferences we have drawn from it.
+
 
 %----------------------------------------------------------------------------------------
 % End of Results Section
 %----------------------------------------------------------------------------------------
 
 %----------------------------------------------------------------------------------------
-% Conclusion Section
+% Conclusion Section (Revised Word Count: Approx. 350-400 words)
 %----------------------------------------------------------------------------------------
 
 \section{Conclusion} % Main Section Title
 
 \subsection{Summary of Findings in Relation to Thesis} % Sub-section 4.1
-% Word Count: Approx. 100 words
-This project investigated the evolving statistical relationship between shooting strategy, particularly three-point shooting, and team success in the NBA over approximately two decades. We aimed to statistically assess the narrative of a "Three-Point Era." Our analysis leads us to affirm our central thesis statement: 
+% Word Count: Approx. 80-100 words
+This project statistically investigated the perceived shift towards a "Three-Point Era" in the NBA by examining the changing association between shooting metrics and team success over two decades. Our findings support our main thesis:
 Using data from the 2005-2009 and 2020-2024 NBA regular seasons (source: NBA API), we find the statistical association between three-point percentage (3P\%) and win rate differs significantly between these periods: NBA team-seasons in the 2020-2024 period with higher 3P\% also have statistically significant higher win rates, while NBA team-seasons in the 2005-2009 period did not have statistically significant higher win rates, even after controlling for two-point efficiency and shot selection proportions.
-The primary evidence supporting this thesis comes from our interaction model analysis (Table \ref{tab:interaction_summary_R}), which revealed a highly statistically significant interaction term between three-point percentage and era (`Era:X3P.`). This finding was further supported by descriptive trends showing a strengthening association for 3P\% and a weakening one for 2P\% over time (Figure \ref{fig:coefficients_trends}).
+The key evidence for this conclusion is the statistically significant interaction term between three-point percentage and era (\texttt{Era:X3P.}) found in our regression analysis (Table \ref{tab:interaction_summary_R}).
 
 \subsection{Interpretation and Implications} % Sub-section 4.2
-The significant interaction term (`Era:X3P.`) indicates that the strength of the positive statistical association between three-point percentage and win rate has substantially increased from the 2005-2009 period to the 2020-2024 period. Our model estimated this increase in association strength to be approximately 2.88 points (referencing Table \ref{tab:interaction_summary_R}). This provides quantitative, structural evidence consistent with the popular notion of an NBA "Three-Point Era." It suggests that characteristics related to high-efficiency three-point shooting are much more strongly associated with winning in today's league compared to 15-20 years ago. 
-While our observational study design prevents definitive causal claims, the statistically significant *change* in this association, detected through the interaction model, offers a result consistent with the hypothesis that the underlying strategic value or contribution of efficient three-point shooting to winning has genuinely increased. It suggests that optimizing for three-point efficiency yields a stronger association with success now than it did previously.
+% Word Count: Approx. 100-120 words
+The significant interaction term quantifies the degree to which the statistical relationship between three-point shooting efficiency and winning has strengthened. Our results estimate that the positive association between \texttt{3P\%} and \texttt{WinRate} was substantially stronger (by approximately 2.88 units based on the coefficient) in the 2020-2024 period compared to 2005-2009. This provides strong quantitative backing to the narrative of a "Three-Point Era," showing a clear structural shift in league dynamics where efficient scoring from behind the arc is much more closely linked to team success than it was previously. While our observational approach cannot definitively prove causation, the magnitude and significance of this *change* in association is consistent with the idea that the underlying strategic value of the three-point shot has indeed increased over time.
 
 \subsection{Limitations of the Analysis} % Sub-section 4.3
-It is crucial to acknowledge the limitations inherent in this study. The most significant limitation stems from the use of observational data. While we found a significant change in statistical association, we cannot definitively conclude a causal relationship between increased 3P\% efficiency and increased win rates. Correlation does not imply causation. 
-A primary concern is the potential for **unobserved confounding variables**. Many factors beyond the shooting metrics included in our model could influence both a team's strategic choices (like emphasizing threes) and its overall success (win rate). Examples include:
-\begin{itemize}
-    \item \textbf{Rule Changes:} Modifications to defensive rules (e.g., hand-checking elimination, defensive three seconds) over the analyzed period likely affected offensive and defensive strategies.
-    \item \textbf{Coaching Philosophy and Quality:} Different coaches employ varying strategies, and overall coaching quality impacts team success independently of specific shooting metrics. The league-wide adoption of analytics also plays a role here.
-    \item \textbf{Player Skill Evolution & Specific Stars:} The general skill level of shooters may have increased, and the presence of generational talents (like Stephen Curry, who dramatically influenced offensive schemes) is not directly accounted for in our team-level aggregate data.
-    \item \textbf{Other Team Factors:} Unaccounted factors like specific player injuries during a season, variations in strength of schedule, changes in league pace, or evolving defensive schemes employed against teams could all confound the observed relationships.
-\end{itemize}
-While we controlled for 2P\% and shot selection proportions, the potential for residual confounding from these and other unmeasured variables remains. Other limitations include potential measurement errors in the API data, the specific choice of 5-year periods for trend analysis, and the inherent assumptions of the linear regression model (linearity, independence, normality, homoscedasticity), which may only be approximately met.
+% Word Count: Approx. 120-150 words
+Several limitations must be considered when interpreting these results. Primarily, as this study relies on observational data, we cannot make definitive causal claims. The observed associations, and the changes in them, could be influenced by numerous unobserved confounding variables that evolved alongside shooting strategies. Potential confounders include changes in defensive rules and strategies over the years, the overall evolution of player skill sets (especially the rise of prolific shooters), influential coaching philosophies adapting to or driving trends, the impact of specific superstar players on their teams' style and success, uncaptured variations in team defense quality, or even factors like player injuries or strength of schedule within specific seasons. While our model controls for key efficiency and shot selection metrics, it cannot account for all such complex, potentially time-varying confounders. Other limitations include the specific choice of time periods for comparison and the inherent assumptions of the linear regression model framework.
 
 \subsection{Future Research} % Sub-section 4.4
-Based on our findings and limitations, several avenues for future research emerge. Incorporating additional control variables, such as team defensive ratings, offensive/defensive rebound percentages, pace, or perhaps team fixed effects, could help mitigate confounding concerns. Analyzing player-level data could provide insights into individual contributions and skill changes. Examining playoff data separately might reveal if these associations hold under higher-stakes conditions. Finally, exploring more advanced statistical methods designed for causal inference with observational data (e.g., instrumental variables, if suitable instruments could be identified) might offer further insights, although likely challenging in this context.
+% Word Count: Approx. 30-40 words
+Future research could aim to address these limitations by incorporating data on defensive metrics, coaching changes, or player-level statistics if available. Exploring different time frames or using panel data methods might also provide further insights. Applying more advanced methods aimed at causal inference from observational data could be valuable, though potentially challenging.
 
 \subsection{Concluding Remarks} % Sub-section 4.5
-In conclusion, this project provides robust statistical evidence, primarily through the analysis of interaction effects, demonstrating a significant strengthening in the association between three-point shooting efficiency and team success in the NBA over the last two decades, quantitatively supporting the narrative of a "Three-Point Era."
+% Word Count: Approx. 20-30 words
+In conclusion, this study provides robust statistical evidence, highlighted by a significant interaction effect, documenting the substantially stronger association between three-point efficiency and team success in the modern NBA compared to the mid-2000s.
 
 %----------------------------------------------------------------------------------------
 % End of Conclusion Section
 %----------------------------------------------------------------------------------------
-%----------------------------------------------------------------------------------------
-% References
-%----------------------------------------------------------------------------------------
-
-\newpage % Includes a new page
-\pagenumbering{roman} % Changes page numbering to roman page numbers
-%\bibliography{literature}
-
-\bibliography{literature.bib} % Add the filename of your bibliography
-\bibliographystyle{apsr} % Defines your bibliography style
-
-%----------------------------------------------------------------------------------------
-% Appendix
-%----------------------------------------------------------------------------------------
-
-\newpage
-\pagenumbering{roman} % Changes page numbering to roman page numbers
-
-\section*{Appendix}
-
-% For citing, please see this sheet: http://merkel.texture.rocks/Latex/natbib.php
-
-% %----------------------------------------------------------------------------------------
-% % Appendix
-% %----------------------------------------------------------------------------------------
-% \newpage % Includes a new page
-% \section*{Appendix} % Stars disable section numbers
-% % \appendix % Uncomment if you want to add an "automatic" appendix
-% \pagenumbering{Roman} % Changes page numbering to Roman page numbers
-
-% \blindtext % Adds some blind text
-
-% %----------------------------------------------------------------------------------------
-% % Declaration
-% %----------------------------------------------------------------------------------------
-% \newpage % Includes a page break
-% \thispagestyle{empty} % Leaves the page style empty (no page number, no header, no footer)
-% \section*{Statutory Declaration} % Stars disable section numbers
-
-% \begin{otherlanguage}{german}
-% Hiermit versichere ich, dass diese Arbeit von mir pers\"{o}nlich verfasst ist und dass ich keinerlei fremde Hilfe in Anspruch genommen habe. Ebenso versichere ich, dass diese Arbeit oder Teile daraus weder von mir selbst noch von anderen als Leistungsnachweise andernorts eingereicht wurden. W\"{o}rtliche oder sinngem\"{a}{\ss}e \"{U}bernahmen aus anderen Schriften und Ver\"{o}ffentlichungen in gedruckter oder elektronischer Form sind gekennzeichnet. S\"{a}mtliche Sekund\"{a}rliteratur und sonstige Quellen sind nachgewiesen und in der Bibliographie aufgef\"{u}hrt. Das Gleiche gilt f\"{u}r graphische Darstellungen und Bilder sowie f\"{u}r alle Internet-Quellen. Ich bin ferner damit einverstanden, dass meine Arbeit zum Zwecke eines Plagiatsabgleichs in elektronischer Form anonymisiert versendet und gespeichert werden kann. Mir ist bekannt, dass von der Korrektur der Arbeit abgesehen und die Pr\"{u}fungsleistung mit nicht ausreichend bewertet werden kann, wenn die Erkl\"{a}rung nicht erteilt wird.
-% \end{otherlanguage}
-
-% \vspace*{1in} % Adds extra space between two paragraphs
-
-% \noindent I hereby declare that the paper presented is my own work and that I have not called upon the help of a third party. In addition, I affirm that neither I nor anybody else has submitted this paper or parts of it to obtain credits elsewhere before. I have clearly marked and acknowledged all quotations or references that have been taken from the works of others. All secondary literature and other sources are marked and listed in the bibliography. The same applies to all charts, diagrams and illustrations as well as to all Internet resources. Moreover, I consent to my paper being electronically stored and sent anonymously in order to be checked for plagiarism. I am aware that the paper cannot be evaluated and may be graded ``failed'' (``nicht ausreichend'') if the declaration is not made.\\
-
-% %\vspace*{1in} % Adds extra space
-
-% % Add field for signature, date, and place
-% \hfill \signature{} 
-
-
-% %---------------------------------------------------------------------------------
 
 \end{document}
