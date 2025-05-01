@@ -233,9 +233,12 @@ central analysis: evaluating whether and how the growing emphasis on three-point
 \subsection{Initial Analysis: Period-Specific Associations}
 % Word Count: Approx. 350-450 words
 
-To get a first look at how relationships might have changed, we fitted separate simple linear regression models $WinRate ~ X3P. + X2P. + X3P_ratio$ for different 5-year periods. We focus here on comparing the earliest period (2005-2009) and the most recent period (2020-2024). Figure \ref{fig:period_models} displays the summary outputs for these two models.
+To get a first look at how relationships might have changed, we fitted separate simple linear regression models for different 5-year periods, specified as follows:
+\begin{equation*}
+\text{WinRate} = \beta_0 + \beta_1 \times \text{3P\%} + \beta_2 \times \text{2P\%} + \beta_3 \times \text{3P\_ratio} + \epsilon
+\end{equation*}
+We focus here on comparing the earliest period (2020-2024). Figure \ref{fig:period_models} displays the summary outputs for these two models.
 
-% Figure for side-by-side model summaries
 \begin{figure}[htbp] 
     \centering
     % Using subcaption package for side-by-side figures
@@ -283,7 +286,14 @@ Figure \ref{fig:coef_trends} clearly shows the coefficient for `X3P.` (blue line
 \subsection{The Interaction Model}
 % Word Count: Approx. 250-350 words
 
-To formally test our thesis that the association between shooting metrics and win rate significantly differs between eras, we fit the interaction model using combined data from the 2005-2009 (coded as Era=0) and 2020-2024 (coded as Era=1) periods. The model specification, including main effects for shooting metrics and the Era dummy variable, along with interaction terms between Era and each shooting metric, was discussed in the Methods section. The results from this R model fit are summarized in Table \ref{tab:interaction_summary_R}.
+To capture the evolving relationship between shooting metrics and team success over time, we fit an interactive linear regression model incorporating both main effects and interaction terms with era. The model is specified as:
+\begin{align*}
+WinRate ={}& \beta_0 + \beta_1 3P\% + \beta_2 2P\% + \beta_3 3P_ratio + \beta_4 2P_ratio + \beta_5 Era \\
+&+ \beta_6 (3P\% \times Era) + \beta_7 (2P\% \times Era) + \beta_8 (3P_ratio \times Era) \\
+&+ \beta_9 (2P_ratio \times Era) + \epsilon. 
+\end{align*}
+
+Our model summary is shown in Table \ref{tab:interaction_summary_R}.
 
 % --- START: Interaction Model Summary Table based on R output image ---
 \begin{table}[htbp]
